@@ -7,7 +7,7 @@ from mediathek_scraper.items import MediathekScraperItem
 class MediathekScraperSpider(scrapy.Spider):
     name = "ard"
     letters = "0-9 A B C D E F G H I K L M N O P Q R S T U V W Z".split(' ')
-    letters = ['A']
+    letters = ['A'] # DEBUG
     start_urls = ["http://www.ardmediathek.de/tv/sendungen-a-z?buchstabe=" + l for l in letters]
 
     def parse(self, response):

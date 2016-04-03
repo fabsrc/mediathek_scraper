@@ -15,7 +15,7 @@ class MediathekScraperSpider(scrapy.Spider):
             query = parse_qs(urlparse(href.extract()).query)
             id = query.get('obj')
             if not id:
-                url = response.urljoin(href.extract())
+                url = response.urljoin(href.extract()) + '&type=1'
                 yield scrapy.Request(url, callback=self.parse)
             else:
                 url = "http://www.3sat.de/mediathek/xmlservice/web/beitragsDetails?id=" + id[0]

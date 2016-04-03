@@ -5,8 +5,8 @@ from mediathek_scraper.items import MediathekScraperItem
 
 class MediathekScraperSpider(scrapy.Spider):
     name = "zdf"
-    numbers = range(0,10)
-    start_urls = ["http://www.zdf.de/ZDFmediathek/hauptnavigation/sendung-a-bis-z/saz%s?flash=off" % n for n in numbers]
+    start_urls = ["http://www.zdf.de/ZDFmediathek/hauptnavigation/sendung-verpasst/day%s?flash=off" % n for n in range(0,8)] + \
+                 ["http://www.zdf.de/ZDFmediathek/hauptnavigation/sendung-a-bis-z/saz%s?flash=off" % n for n in range(0,10)]
 
     def parse(self, response):
         for href in response.css("div.beitragListe li > .image > a::attr('href')"):
