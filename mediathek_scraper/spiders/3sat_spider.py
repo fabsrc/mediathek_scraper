@@ -1,32 +1,30 @@
 import scrapy
-from urlparse import urlparse
+from urlparse import urlparse, parse_qs
 from scrapy.selector import Selector
 from mediathek_scraper.items import MediathekScraperItem
 
 class MediathekScraperSpider(scrapy.Spider):
-    name = "zdf"
-    numbers = range(0,10)
-    start_urls = ["http://www.zdf.de/ZDFmediathek/hauptnavigation/sendung-a-bis-z/saz%s?flash=off" % n for n in numbers]
+    name = "3sat"
+    start_urls = [
+        "http://www.3sat.de/mediathek/?mode=verpasst0&type=1",
+        "http://www.3sat.de/mediathek/?mode=sendungenaz"
+    ]
 
     def parse(self, response):
-        for href in response.css("div.beitragListe li > .image > a::attr('href')"):
-            url = response.urljoin(href.extract())
-            yield scrapy.Request(url, callback=self.parse_show)
+        for href in response.css(".BoxHeadline a.MediathekLink::attr('href')"):
+            query = parse_qs(urlparse(href.extract()).query)
+            id = query.get('obj')
+            if not id:
+                url = response.urljoin(href.extract())
+                yield scrapy.Request(url, callback=self.parse)
+            else:
+                url = "http://www.3sat.de/mediathek/xmlservice/web/beitragsDetails?id=" + id[0]
+                yield scrapy.Request(url, callback=self.parse_item)
 
-    def parse_show(self, response):
-        for href in response.css("div.beitragListe li > .image > a::attr('href')"):
-            url = response.urljoin(href.extract())
-            yield scrapy.Request(url, callback=self.parse_id)
-
-        next_page = response.css('a.weitereBeitraege::attr("href")')
+        next_page = response.css('a.TargetDimFull::attr("href")')
         if next_page:
-          url = response.urljoin(next_page[0].extract())
-          yield scrapy.Request(url, callback=self.parse_show)
-
-    def parse_id(self, response):
-        id = response.xpath('//div[@class="beitrag"]/div[@id="playerContainer"]/@class').extract()
-        if id:
-            yield scrapy.Request("http://www.zdf.de/ZDFmediathek/xmlservice/web/beitragsDetails?id=" + id[0], callback=self.parse_item)
+            url = response.urljoin(next_page[0].extract())
+            yield scrapy.Request(url, callback=self.parse)
 
     def parse_item(self, response):
         xml = Selector(response=response, type="xml").xpath('//response/video')

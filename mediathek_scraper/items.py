@@ -9,10 +9,20 @@ import scrapy
 
 
 class MediathekScraperItem(scrapy.Item):
-    title = scrapy.Field()
-    show = scrapy.Field()
-    date = scrapy.Field()
-    desc = scrapy.Field()
+    id = scrapy.Field()
     type = scrapy.Field()
+    channel = scrapy.Field()
+
+    title = scrapy.Field()
+    description = scrapy.Field()
+    url = scrapy.Field()
+    fsk = scrapy.Field()
+    geo = scrapy.Field()
+
+    show = scrapy.Field()
+
+    date = scrapy.Field()
     duration = scrapy.Field()
+    ttl = scrapy.Field()
+
     files = scrapy.Field()

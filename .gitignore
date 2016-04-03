@@ -1,2 +1,4 @@
+*.pyc
 build/
 project.egg-info
+items.jsonl
