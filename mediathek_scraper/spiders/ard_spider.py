@@ -7,7 +7,6 @@ from mediathek_scraper.items import MediathekScraperItem
 class MediathekScraperSpider(scrapy.Spider):
     name = "ard"
     letters = "0-9 A B C D E F G H I K L M N O P Q R S T U V W Z".split(' ')
-    letters = ['A'] # DEBUG
     start_urls = ["http://www.ardmediathek.de/tv/sendungen-a-z?buchstabe=" + l for l in letters]
 
     def parse(self, response):
@@ -34,7 +33,7 @@ class MediathekScraperSpider(scrapy.Spider):
       item['title'] = response.xpath("//meta[@name='dcterms.title']/@content").extract_first()
       item['description'] = response.xpath('//p[@itemprop="description"]/text()').extract_first()
       item['url'] = response.xpath('//meta[@itemprop="url"]/@content').extract_first()
-      # item['fsk'] = response.xpath('details/fsk/text()').extract_first()
+      # item['fsk'] = response.xpath('details/fsk/text()').extract_first() # TODO
 
       item['show'] = response.xpath('//meta[@name="dcterms.isPartOf"]/@content').extract_first()
 
@@ -52,15 +51,12 @@ class MediathekScraperSpider(scrapy.Spider):
       item['type'] = jsonresponse['_type']
       item['geo'] = jsonresponse['_geoblocked']
 
-      # item['files'] = {}
-      # item['files']['hd'] = {}
-      # item['files']['hd']['url'] = jsonresponse['_mediaArray'][1]['_mediaStreamArray'][3]['_stream']
-      # # item['files']['hd']['size'] =
-      # item['files']['high'] = {}
-      # item['files']['high']['url'] = jsonresponse['_mediaArray'][1]['_mediaStreamArray'][2]['_stream'][0]
-      # # item['files']['high']['size'] =
-      # item['files']['low'] = {}
-      # item['files']['low']['url'] = jsonresponse['_mediaArray'][1]['_mediaStreamArray'][1]['_stream'][0]
-      # # item['files']['low']['size'] =
+      item['files'] = {}
+      item['files']['hd'] = {}
+      item['files']['hd']['url'] = [v for v in jsonresponse['_mediaArray'][0]['_mediaStreamArray'] if v['_quality'] == 3][0].get('_stream', '')
+      item['files']['high'] = {}
+      item['files']['high']['url'] = [v for v in jsonresponse['_mediaArray'][0]['_mediaStreamArray'] if v['_quality'] == 2][0].get('_stream', '')
+      item['files']['low'] = {}
+      item['files']['low']['url'] = [v for v in jsonresponse['_mediaArray'][0]['_mediaStreamArray'] if v['_quality'] == 1][0].get('_stream', '')
 
       yield item

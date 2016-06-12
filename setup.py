@@ -3,8 +3,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name         = 'project',
-    version      = '1.0',
+    name         = 'mediathek_scraper',
+    version      = '0.7',
     packages     = find_packages(),
     entry_points = {'scrapy': ['settings = mediathek_scraper.settings']},
 )
